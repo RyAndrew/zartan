@@ -9,11 +9,22 @@ locals {
   nodash_subdomain = replace(var.udp_subdomain, "-", "_")
 }
 
+terraform {
+  required_providers {
+    okta = {
+      source = "okta/okta"
+      version = "~> 3.15"
+    }
+  }
+}
+
 provider "okta" {
   org_name  = var.org_name
   api_token = var.api_token
   base_url  = var.base_url
-  version   = "~> 3.0"
+  log_level = 5
+  max_retries = 1
+  request_timeout = 30
 }
 data "okta_group" "all" {
   name = "Everyone"
@@ -28,7 +39,14 @@ resource "okta_app_oauth" "healthcare" {
   ]
   response_types = ["code"]
   issuer_mode    = "ORG_URL"
-  groups         = ["${data.okta_group.all.id}"]
+  //groups         = ["${data.okta_group.all.id}"]
+}
+resource "okta_app_group_assignments" "healthcare_group" {
+  app_id   = "healthcare"
+  group {
+    id = "${data.okta_group.all.id}"
+    priority = 1
+  }
 }
 resource "okta_trusted_origin" "healthcare_https" {
   name   = "${var.udp_subdomain} ${var.demo_app_name} HTTPS"
@@ -58,7 +76,7 @@ resource "okta_auth_server_policy_rule" "healthcare" {
   grant_type_whitelist = ["authorization_code", "implicit"]
   scope_whitelist      = ["*"]
 }
-resource "okta_user_schema" "customfield1" {
+resource "okta_user_schema_property" "customfield1" {
   index       = "${local.nodash_subdomain}_${var.demo_app_name}_last_verified_date"
   title       = "${var.udp_subdomain}_${var.demo_app_name}_last_verified_date"
   type        = "string"
@@ -68,7 +86,7 @@ resource "okta_user_schema" "customfield1" {
   permissions = "READ_WRITE"
 }
 
-resource "okta_user_schema" "customfield2" {
+resource "okta_user_schema_property" "customfield2" {
   index       = "${local.nodash_subdomain}_${var.demo_app_name}_evident_id"
   title       = "${var.udp_subdomain}_${var.demo_app_name}_evident_id"
   type        = "string"
@@ -76,10 +94,10 @@ resource "okta_user_schema" "customfield2" {
   master      = "OKTA"
   scope       = "SELF"
   permissions = "READ_WRITE"
-  depends_on  = [okta_user_schema.customfield1]
+  depends_on  = [okta_user_schema_property.customfield1]
 }
 
-resource "okta_user_schema" "customfield3" {
+resource "okta_user_schema_property" "customfield3" {
   index       = "${local.nodash_subdomain}_${var.demo_app_name}_dob"
   title       = "${var.udp_subdomain}_${var.demo_app_name}_dob"
   type        = "string"
@@ -87,10 +105,10 @@ resource "okta_user_schema" "customfield3" {
   master      = "OKTA"
   scope       = "SELF"
   permissions = "READ_WRITE"
-  depends_on  = [okta_user_schema.customfield2]
+  depends_on  = [okta_user_schema_property.customfield2]
 }
 
-resource "okta_user_schema" "customfield4" {
+resource "okta_user_schema_property" "customfield4" {
   index       = "${local.nodash_subdomain}_${var.demo_app_name}_gender"
   title       = "${var.udp_subdomain}_${var.demo_app_name}_gender"
   type        = "string"
@@ -98,10 +116,10 @@ resource "okta_user_schema" "customfield4" {
   master      = "OKTA"
   scope       = "SELF"
   permissions = "READ_WRITE"
-  depends_on  = [okta_user_schema.customfield3]
+  depends_on  = [okta_user_schema_property.customfield3]
 }
 
-resource "okta_user_schema" "customfield5" {
+resource "okta_user_schema_property" "customfield5" {
   index       = "${local.nodash_subdomain}_${var.demo_app_name}_hasvisited"
   title       = "${var.udp_subdomain}_${var.demo_app_name}_hasvisited"
   type        = "string"
@@ -109,10 +127,10 @@ resource "okta_user_schema" "customfield5" {
   master      = "OKTA"
   scope       = "SELF"
   permissions = "READ_WRITE"
-  depends_on  = [okta_user_schema.customfield4]
+  depends_on  = [okta_user_schema_property.customfield4]
 }
 
-resource "okta_user_schema" "customfield6" {
+resource "okta_user_schema_property" "customfield6" {
   index       = "${local.nodash_subdomain}_${var.demo_app_name}_consent"
   title       = "${var.udp_subdomain}_${var.demo_app_name}_consent"
   type        = "string"
@@ -120,23 +138,29 @@ resource "okta_user_schema" "customfield6" {
   master      = "OKTA"
   scope       = "SELF"
   permissions = "READ_WRITE"
-  depends_on  = [okta_user_schema.customfield5]
+  depends_on  = [okta_user_schema_property.customfield5]
 }
 output "client_id" {
   value = "${okta_app_oauth.healthcare.client_id}"
+  sensitive = true
 }
 output "client_secret" {
   value = "${okta_app_oauth.healthcare.client_secret}"
+  sensitive = true
 }
 output "domain" {
   value = "${var.org_name}.${var.base_url}"
+  sensitive = true
 }
 output "auth_server_id" {
   value = "${okta_auth_server.healthcare.id}"
+  sensitive = true
 }
 output "issuer" {
   value = "${okta_auth_server.healthcare.issuer}"
+  sensitive = true
 }
 output "okta_app_oauth_id" {
   value = "${okta_app_oauth.healthcare.id}"
+  sensitive = true
 }
