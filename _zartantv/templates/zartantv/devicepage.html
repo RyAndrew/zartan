@@ -8,7 +8,7 @@
             <a href="#" class="btn btn-primary btn-lg id-open">Device Flow Information</a>
             <div class="background" id="background">
                 <div class="tv" id="tv">
-                    <a href="/index"><img src={{config.settings.app_logo}} border='0' style="max-height:100px;max-width:300px;height:auto;width:auto;margin: 250 0 0 450;position:absolute;" onerror="this.style.display='none'"></a>
+                    <a href="/index"><img src="{{config.settings.app_logo}}" border='0' style="max-height:100px;max-width:300px;height:auto;width:auto;margin: 250 0 0 450;position:absolute;" onerror="this.style.display='none'"></a>
                     <div class="appbar" id="appbar">
                         <button class="action-button shadow animate blue" onclick="getcode()">{{appname}}</button>
                     </div>
@@ -199,7 +199,7 @@
         $.ajax({
             'async': false,
             'type': "POST",
-            'url': "/zartantv/revoketoken",
+            'url': "/atkotv/revoketoken",
             'data': {
                 "token": window.sessionStorage["d_access_token"],
                 "tokenhint": "access_token"
@@ -215,7 +215,7 @@
         $.ajax({
             'async': false,
             'type': "POST",
-            'url': "/zartantv/revoketoken",
+            'url': "/atkotv/revoketoken",
             'data': {
                 "token": window.sessionStorage["d_refresh_token"],
                 "tokenhint": "refresh_token"
@@ -233,7 +233,7 @@
         $.ajax({
             'async': false,
             'type': "GET",
-            'url': "/zartantv/device",
+            'url': "/atkotv/device",
             'data': {},
             'success': function (data) {
                 response = data;
@@ -286,7 +286,7 @@
       $.ajax({
             'async': false,
             'type': "GET",
-            'url': "/zartantv/token",
+            'url': "/atkotv/token",
             'data': {
                 "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
                 "client_id": "{{client_id}}",
@@ -322,13 +322,15 @@
         console.log( "load_token" );
         refresh_token =  window.sessionStorage["d_refresh_token"]
         var newtokens = "";
-        if (refresh_token != "")
+        if (refresh_token == "")
         {
+          return false
+        }
             console.log("Check Current Tokens");
             $.ajax({
                 'async': false,
                 'type': "POST",
-                'url': "/zartantv/token_check",
+                'url': "/atkotv/token_check",
                 'data': {
                     "access_token":  window.sessionStorage["d_access_token"],
                     "id_token":  window.sessionStorage["d_id_token"],
@@ -359,7 +361,6 @@
                 return false;
             }
             return false;
-        }
     }
 
     function check_token() {
@@ -368,7 +369,7 @@
             $.ajax({
                 'async': false,
                 'type': "POST",
-                'url': "/zartantv/token_check",
+                'url': "/atkotv/token_check",
                 'data': {
                     "access_token":  window.sessionStorage["d_access_token"],
                     "id_token":  window.sessionStorage["d_id_token"],

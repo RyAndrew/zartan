@@ -17,13 +17,13 @@ from GlobalBehaviorandComponents.validation import is_authenticated, get_userinf
 logger = logging.getLogger(__name__)
 
 # set blueprint
-zartantv_views_bp = Blueprint('zartantv_views_bp', __name__, template_folder='templates', static_folder='static', static_url_path='static')
+atkotv_views_bp = Blueprint('atkotv_views_bp', __name__, template_folder='templates', static_folder='static', static_url_path='static')
 
 
-@zartantv_views_bp.route("/devicepage")
+@atkotv_views_bp.route("/devicepage")
 @apply_remote_config
-def zartantv_devicepage():
-    logger.debug("zartantv_devicepage()")
+def atkotv_devicepage():
+    logger.debug("atkotv_devicepage()")
     client_id = session[SESSION_INSTANCE_SETTINGS_KEY]["settings"]["app_deviceflow_clientid"]
     appname = session[SESSION_INSTANCE_SETTINGS_KEY]["settings"]["app_deviceflow_appname"]
 
@@ -33,7 +33,7 @@ def zartantv_devicepage():
     reset_tokens = "false"
 
     return render_template(
-        "zartantv/devicepage.html",
+        "atkotv/devicepage.html",
         user_info=get_userinfo(),
         id_token=id_token,
         access_token=access_token,
@@ -44,10 +44,10 @@ def zartantv_devicepage():
         config=session[SESSION_INSTANCE_SETTINGS_KEY])
 
 
-@zartantv_views_bp.route("/device")
+@atkotv_views_bp.route("/device")
 @apply_remote_config
-def zartantv_device():
-    logger.debug("zartantv_device()")
+def atkotv_device():
+    logger.debug("atkotv_device()")
 
     letters_and_numbers = string.ascii_uppercase + string.digits
     result_str = ''.join(random.choice(letters_and_numbers) for i in range(8))
@@ -62,7 +62,7 @@ def zartantv_device():
     device_id = PKCE.generate_code_verifier(code_length2)
 
     verification_uri = url_for(
-        "zartantv_views_bp.zartantv_device_activate",
+        "atkotv_views_bp.atkotv_device_activate",
         _external=True,
         _scheme=session[SESSION_INSTANCE_SETTINGS_KEY]["app_scheme"]
     )
@@ -87,10 +87,10 @@ def zartantv_device():
     return body
 
 
-@zartantv_views_bp.route("/token")
+@atkotv_views_bp.route("/token")
 @apply_remote_config
-def zartantv_token():
-    logger.debug("zartantv_token()")
+def atkotv_token():
+    logger.debug("atkotv_token()")
 
     device_code = request.args.get('device_code')
 
@@ -110,10 +110,10 @@ def zartantv_token():
     return response
 
 
-@zartantv_views_bp.route("/revoketoken", methods=["POST"])
+@atkotv_views_bp.route("/revoketoken", methods=["POST"])
 @apply_remote_config
-def zartantv_revoketoken():
-    logger.debug("zartantv_revoketoken()")
+def atkotv_revoketoken():
+    logger.debug("atkotv_revoketoken()")
 
     client_id = session[SESSION_INSTANCE_SETTINGS_KEY]["settings"]["app_deviceflow_clientid"]
     client_secret = session[SESSION_INSTANCE_SETTINGS_KEY]["settings"]["app_deviceflow_clientsecret"]
@@ -128,10 +128,10 @@ def zartantv_revoketoken():
     return "Completed"
 
 
-@zartantv_views_bp.route("/token_check", methods=["POST"])
+@atkotv_views_bp.route("/token_check", methods=["POST"])
 @apply_remote_config
-def zartantv_token_check():
-    logger.debug("zartantv_token_check()")
+def atkotv_token_check():
+    logger.debug("atkotv_token_check()")
 
     access_token = request.form['access_token']
     id_token = request.form['id_token']
@@ -169,7 +169,7 @@ def zartantv_token_check():
                         logging.debug("get new AT")
 
                         responseurl = url_for(
-                            "zartantv_views_bp.zartantv_devicepage",
+                            "atkotv_views_bp.atkotv_devicepage",
                             _external=True,
                             _scheme=session[SESSION_INSTANCE_SETTINGS_KEY]["app_scheme"]
                         )
@@ -197,22 +197,22 @@ def zartantv_token_check():
     return response
 
 
-@zartantv_views_bp.route("/device_activate")
+@atkotv_views_bp.route("/device_activate")
 @apply_remote_config
 @check_okta_api_token
 @check_zartan_config
-def zartantv_device_activate():
-    logger.debug("zartantv_device_activate()")
+def atkotv_device_activate():
+    logger.debug("atkotv_device_activate()")
     return render_template(
-        "zartantv/device_activate.html",
+        "atkotv/device_activate.html",
         user_info=get_userinfo(),
         config=session[SESSION_INSTANCE_SETTINGS_KEY])
 
 
-@zartantv_views_bp.route("/device_validatecode", methods=["POST"])
+@atkotv_views_bp.route("/device_validatecode", methods=["POST"])
 @apply_remote_config
-def zartantv_device_validatecode():
-    logger.debug("zartantv_device_validatecode()")
+def atkotv_device_validatecode():
+    logger.debug("atkotv_device_validatecode()")
 
     url = "https://jl0tn0gk0e.execute-api.us-east-2.amazonaws.com/default/prd-zartan-deviceinformation?user_code=" + request.form["user_code"]
     headers = {
@@ -237,7 +237,7 @@ def zartantv_device_validatecode():
         RestUtil.execute_post(url, body, headers=headers)
 
         response = url_for(
-            "zartantv_views_bp.zartantv_device_register",
+            "atkotv_views_bp.atkotv_device_register",
             _external=True,
             _scheme=session[SESSION_INSTANCE_SETTINGS_KEY]["app_scheme"]
         )
@@ -247,10 +247,10 @@ def zartantv_device_validatecode():
     return response
 
 
-@zartantv_views_bp.route("/device_register")
+@atkotv_views_bp.route("/device_register")
 @apply_remote_config
-def zartantv_device_register():
-    logger.debug("zartantv_device_register()")
+def atkotv_device_register():
+    logger.debug("atkotv_device_register()")
     client_id = session[SESSION_INSTANCE_SETTINGS_KEY]["settings"]["app_deviceflow_clientid"]
     okta_admin = OktaAdmin(session[SESSION_INSTANCE_SETTINGS_KEY])
     idplist = okta_admin.get_idps()
@@ -288,7 +288,7 @@ def zartantv_device_register():
     s3response = RestUtil.execute_get(url, headers=headers)
     del s3response['state']
     return render_template(
-        "zartantv/device_register.html",
+        "atkotv/device_register.html",
         templatename=get_app_vertical(),
         config=session[SESSION_INSTANCE_SETTINGS_KEY],
         state=session["device_state"],
@@ -303,11 +303,11 @@ def zartantv_device_register():
         deviceinfo=json.dumps(s3response, sort_keys=True, indent=4))
 
 
-@zartantv_views_bp.route('/authorization-code/callback', methods=["POST"])
+@atkotv_views_bp.route('/authorization-code/callback', methods=["POST"])
 @apply_remote_config
-def zartantv_callback():
+def atkotv_callback():
     """ handler for the oidc call back of the app """
-    logger.debug("zartantv_callback()")
+    logger.debug("atkotv_callback()")
     response = None
     has_app_level_mfa_policy = False
     client_id = session[SESSION_INSTANCE_SETTINGS_KEY]["settings"]["app_deviceflow_clientid"]
@@ -348,7 +348,7 @@ def zartantv_callback():
         user = okta_auth.introspect_with_clientid(oauth_token['id_token'], client_id=client_id, client_secret=client_secret, token_type_hint="idtoken")
 
         responseurl = url_for(
-            "zartantv_views_bp.zartantv_device_complete",
+            "atkotv_views_bp.atkotv_device_complete",
             _external=True,
             _scheme=session[SESSION_INSTANCE_SETTINGS_KEY]["app_scheme"]
         )
@@ -387,10 +387,10 @@ def zartantv_callback():
     return response
 
 
-@zartantv_views_bp.route("/device_complete")
+@atkotv_views_bp.route("/device_complete")
 @apply_remote_config
-def zartantv_device_complete():
-    logger.debug("zartantv_device_complete()")
+def atkotv_device_complete():
+    logger.debug("atkotv_device_complete()")
 
     okta_admin = OktaAdmin(session[SESSION_INSTANCE_SETTINGS_KEY])
 
@@ -425,13 +425,13 @@ def zartantv_device_complete():
         del s3response['device_id']
         del s3response['device_code']
         return render_template(
-            "zartantv/device_complete.html",
+            "atkotv/device_complete.html",
             config=session[SESSION_INSTANCE_SETTINGS_KEY],
             deviceinfo=json.dumps(s3response, sort_keys=True, indent=4))
     else:
 
         redirect_url = url_for(
-            "zartantv_views_bp.zartantv_device_activate",
+            "atkotv_views_bp.atkotv_device_activate",
             _external=True,
             _scheme=session[SESSION_INSTANCE_SETTINGS_KEY]["app_scheme"])
 
@@ -439,24 +439,24 @@ def zartantv_device_complete():
 
 
 # Required for Login Landing Page
-@zartantv_views_bp.route("/profile")
+@atkotv_views_bp.route("/profile")
 @apply_remote_config
 @is_authenticated
-def zartantv_profile():
-    logger.debug("zartantv_profile()")
+def atkotv_profile():
+    logger.debug("atkotv_profile()")
     return render_template(
-        "zartantv/profile.html",
+        "atkotv/profile.html",
         user_info=get_userinfo(),
         id_token=TokenUtil.get_id_token(request.cookies),
         access_token=TokenUtil.get_access_token(request.cookies),
         config=session[SESSION_INSTANCE_SETTINGS_KEY])
 
 
-@zartantv_views_bp.route("/mydevices")
+@atkotv_views_bp.route("/mydevices")
 @apply_remote_config
 @is_authenticated
-def zartantv_mydevices():
-    logger.debug("zartantv_mydevices()")
+def atkotv_mydevices():
+    logger.debug("atkotv_mydevices()")
 
     user_info = get_userinfo()
     user_id = user_info["sub"]
@@ -479,17 +479,17 @@ def zartantv_mydevices():
     logger.debug(devices)
 
     return render_template(
-        "zartantv/mydevices.html",
+        "atkotv/mydevices.html",
         user_info=get_userinfo(),
         devices=devices,
         config=session[SESSION_INSTANCE_SETTINGS_KEY])
 
 
-@zartantv_views_bp.route("/removedevice")
+@atkotv_views_bp.route("/removedevice")
 @apply_remote_config
 @is_authenticated
-def zartantv_removedevice():
-    logger.debug("zartantv_removedevice()")
+def atkotv_removedevice():
+    logger.debug("atkotv_removedevice()")
 
     user_info = get_userinfo()
     user_id = user_info["sub"]
@@ -519,7 +519,7 @@ def zartantv_removedevice():
     okta_admin.update_application_user_profile_by_clientid(user_id=user_id, app_user_profile=user_data, client_id=client_id)
 
     redirect_url = url_for(
-        "zartantv_views_bp.zartantv_mydevices",
+        "atkotv_views_bp.atkotv_mydevices",
         _external=True,
         _scheme=session[SESSION_INSTANCE_SETTINGS_KEY]["app_scheme"])
 
@@ -530,7 +530,7 @@ def get_oauth_token_from_login(code, grant_type, auth_options=None, headers=None
     logger.debug("OktaAuth.get_oauth_token()")
     okta_headers = OktaUtil.get_oauth_okta_headers(headers)
 
-    redirect_url = url_for("zartantv_views_bp.zartantv_callback", _external=True, _scheme=session[SESSION_INSTANCE_SETTINGS_KEY]["app_scheme"])
+    redirect_url = url_for("atkotv_views_bp.atkotv_callback", _external=True, _scheme=session[SESSION_INSTANCE_SETTINGS_KEY]["app_scheme"])
 
     url = (
         "{issuer}/v1/token?"

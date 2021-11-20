@@ -104,8 +104,8 @@ from _streamingservice.views import streamingservice_views_bp
 app.register_blueprint(streamingservice_views_bp, url_prefix='/streamingservice')
 
 # streaming service theme
-from _zartantv.views import zartantv_views_bp
-app.register_blueprint(zartantv_views_bp, url_prefix='/zartantv')
+from _atkotv.views import atkotv_views_bp
+app.register_blueprint(atkotv_views_bp, url_prefix='/atkotv')
 
 # finance theme
 from _finance.views import finance_views_bp
